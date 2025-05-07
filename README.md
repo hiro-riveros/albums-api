@@ -5,7 +5,7 @@ go get .
 
 # RUN PROJECT
 ``` sh
-go run .
+go run ./cmd/api/main.go
 ```
 
 # ENDPOINTS
