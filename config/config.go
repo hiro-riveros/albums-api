@@ -16,17 +16,17 @@ type DatabaseConf struct {
 	SSLMode  string
 }
 
-func LoadConfig() (DatabaseConf, error) {
+func LoadDBConfig() (DatabaseConf, error) {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Error loading .env file")
-		return loadConfigFromEnv()
+		return loadDbConfigFromEnv()
 	}
 
-	return loadConfigFromEnv()
+	return loadDbConfigFromEnv()
 }
 
-func loadConfigFromEnv() (DatabaseConf, error) {
+func loadDbConfigFromEnv() (DatabaseConf, error) {
 	return DatabaseConf{
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
