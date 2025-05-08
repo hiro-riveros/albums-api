@@ -1,46 +1,29 @@
 package main
 
 import (
-	"album-api/config"
 	"album-api/internal/handlers"
+	"album-api/internal/middlewares"
 	"album-api/internal/models"
-	"album-api/internal/routes"
 	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
 func main() {
-	config, err := config.LoadConfig()
-	if err != nil {
-		log.Fatalf("Error loading config: %v", err)
-	}
-
-	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		config.Host, config.Port, config.User, config.Password, config.DBName, config.SSLMode)
-	db, err = gorm.Open(postgres.Open(dataSourceName), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
-	}
-	fmt.Println("Successfully connected to PostgreSQL database!")
-
-	// Auto Migrate
-	db.AutoMigrate(&models.Album{})
+	models.ConnectDataBase()
 
 	// Gin Init
 	router := gin.Default()
-
-	// Model Instance
-	albumHander := handlers.NewAlbumHandler(db)
-
+	publicRoutes := router.Group("/")
+	publicRoutes.POST("/login", handlers.Login)
+	publicRoutes.POST("/registration", handlers.Register)
 	// Router
-	routes.SetupAlbumRoutes(router, albumHander)
+	protectedRoutes := router.Group("/api")
+	protectedRoutes.Use(middlewares.JwtAuthMiddleware())
+	protectedRoutes.GET("/albums", handlers.GetAlbums)
+	protectedRoutes.GET("/albums/:id", handlers.GetAlbumById)
+	protectedRoutes.POST("/albums", handlers.PostAlbums)
 
 	// Start Server
 	port := ":8080"
@@ -48,8 +31,4 @@ func main() {
 	if err := router.Run(port); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
-}
-
-func GetDB() *gorm.DB {
-	return db
 }
