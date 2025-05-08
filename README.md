@@ -5,15 +5,22 @@ go get .
 
 # RUN PROJECT
 ``` sh
-go run ./cmd/api/main.go
+go run cmd/api/main.go
 ```
 
 # ENDPOINTS
+
+# Public
+POST
+  - /registration
+  - /login
+
+# Authorization Required
 GET
-  - /albums
-  - /albums/:id
+  - /api/albums
+  - /api/albums/:id
 
 POST
-  - /albums
+  - /api/albums
 
 
